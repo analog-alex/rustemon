@@ -1,5 +1,6 @@
 mod looper;
 mod command;
+mod counter;
 
 use std::fs;
 
@@ -61,7 +62,5 @@ fn main() {
     println!("Run '{}' commands when file changes are detected", parsed_args.command);
 
     // start the main loop
-    looper::Looper::new(
-        parsed_args.target_folders,
-    ).do_loop(parsed_args.command);
+    looper::do_loop(parsed_args.target_folders, parsed_args.command);
 }
