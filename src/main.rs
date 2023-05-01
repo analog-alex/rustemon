@@ -62,7 +62,7 @@ fn main() {
 
     // validate the paths (we panic if something is wrong)
     parsed_args.validate_paths();
-    parsed_args.validate_command()
+    parsed_args.validate_command();
 
     // helpful console prints
     println!("Listen on folder(s): {:?}", parsed_args.target_folders);

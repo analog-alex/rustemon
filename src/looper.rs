@@ -1,12 +1,14 @@
 use std::thread;
 use std::time::Duration;
 use std::path::Path;
+use colored::Colorize;
 
 use notify::{RecursiveMode, Watcher, EventKind, event, recommended_watcher};
 
 use crate::command::run_command;
-use crate::counter::{increment_global_counter, read_global_counter, reset_global_counter};
+use crate::counter;
 
+static WAIT_TIME_MILLIS: u64 = 200;
 
 // store the main logic of the program
 pub fn do_loop(target_folders: Vec<String>, cmd_with_args: Vec<String>) {
@@ -16,7 +18,7 @@ pub fn do_loop(target_folders: Vec<String>, cmd_with_args: Vec<String>) {
             // we got a valid event, let's check and action on it
             Ok(event) => {
                 if handle_event(event) {
-                    increment_global_counter();
+                    counter::increment_global_counter();
                 }
             }
             // something went wrong, stop program, allow user to restart
@@ -30,17 +32,21 @@ pub fn do_loop(target_folders: Vec<String>, cmd_with_args: Vec<String>) {
             .unwrap_or_else(|e| panic!("watcher error: {:?}", e));
     }
 
+
+    // first, run the command for the first time
+    run_command(cmd_with_args.clone());
+
+
     // sleep a small divisor of polling interval
     // wake up to check if something has changed
     loop {
-        thread::sleep(Duration::from_millis(100));
+        thread::sleep(Duration::from_millis(WAIT_TIME_MILLIS));
 
         // if something has changed since last loop, run command with args and reset the counter
-        if read_global_counter() > 0 {
-            reset_global_counter();
+        if counter::read_global_counter() > 0 {
+            counter::reset_global_counter();
+            println!("\n{}\n", "Changes detected. Run then listen.".bright_green()); // tell user we're listening again
             run_command(cmd_with_args.clone());
-            // tell user we're listening again
-            println!("Listening...")
         }
     }
 }
