@@ -9,7 +9,7 @@ use crate::counter::{increment_global_counter, read_global_counter, reset_global
 
 
 // store the main logic of the program
-pub fn do_loop(target_folders: Vec<String>, cmd: String) {
+pub fn do_loop(target_folders: Vec<String>, cmd_with_args: Vec<String>) {
 
     let mut watcher = recommended_watcher(|res| {
         match res {
@@ -30,14 +30,17 @@ pub fn do_loop(target_folders: Vec<String>, cmd: String) {
             .unwrap_or_else(|e| panic!("watcher error: {:?}", e));
     }
 
-    // don't shutdown program, just sleep a small divisor of polling interval
+    // sleep a small divisor of polling interval
+    // wake up to check if something has changed
     loop {
         thread::sleep(Duration::from_millis(100));
 
-        // if something has changed since last loop, run command
+        // if something has changed since last loop, run command with args and reset the counter
         if read_global_counter() > 0 {
-            run_command(cmd.clone());
             reset_global_counter();
+            run_command(cmd_with_args.clone());
+            // tell user we're listening again
+            println!("Listening...")
         }
     }
 }

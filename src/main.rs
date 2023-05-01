@@ -26,7 +26,7 @@ struct Args {
 #[derive(Debug)]
 pub struct ParsedArgs {
     target_folders: Vec<String>,
-    command: String,
+    command: Vec<String>,
 }
 
 impl ParsedArgs {
@@ -40,26 +40,33 @@ impl ParsedArgs {
             }
         }
     }
+
+    pub fn validate_command(&self) {
+        if self.command.len() == 0 {
+            panic!("Command must have at least one argument");
+        }
+    }
 }
+
+static COMMA_SEPARATOR: &str = ",";
+static SPACE_SEPARATOR: &str = " ";
 
 fn main() {
     let args = Args::parse();
 
-    let target_folders_list = args.target_folders;
-    let command = args.command;
-
     // parse the raw args
     let parsed_args = ParsedArgs {
-        target_folders: target_folders_list.split(",").map(|s| s.to_string()).collect(),
-        command,
+        target_folders: args.target_folders.split(COMMA_SEPARATOR).map(|s| s.to_string()).collect(),
+        command: args.command.split(SPACE_SEPARATOR).map(|s| s.to_string()).collect(),
     };
 
-    // validate the paths
+    // validate the paths (we panic if something is wrong)
     parsed_args.validate_paths();
+    parsed_args.validate_command()
 
     // helpful console prints
     println!("Listen on folder(s): {:?}", parsed_args.target_folders);
-    println!("Run '{}' commands when file changes are detected", parsed_args.command);
+    println!("Run '{:?}' command when file changes are detected", parsed_args.command);
 
     // start the main loop
     looper::do_loop(parsed_args.target_folders, parsed_args.command);
