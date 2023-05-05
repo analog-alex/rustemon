@@ -28,4 +28,4 @@ check_path:
 
 # Install the release binary to the specified path
 install_to_path: check_path build
-	cp target/release/$(BIN_NAME) /usr/local/bin/$(BIN_NAME)
+	sudo cp target/release/$(BIN_NAME) /usr/local/bin/$(BIN_NAME)
