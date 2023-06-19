@@ -50,26 +50,25 @@ pub fn run_command(cmd_with_args: Vec<String>) {
 
     // If command spawn failed, inform user and return function here
     if let Err(err) = child_process {
-        println!("Command did not spawn, error: {:?}", err);
+        println!("{}", format!("{:?}", err).bright_red());
         return;
     }
 
     // Safe unwrap, we just checked for error
     let mut child = child_process.unwrap();
-
-
+    
     // As long as the child process is running, print its output
-    // TODO -- handle potential thread leak here
     if let Some(stdout) = child.stdout.take() {
         let reader = BufReader::new(stdout);
 
         // Run this on another thread
+        // TODO -- handle potential thread leak here
         thread::Builder::new()
             .name("output_reader".to_string())
             .spawn(move || {
                 for line in reader.lines() {
                     if let Ok(line) = line {
-                        println!("{}", line.blue());
+                        println!("{}", line.bright_cyan());
                     }
                 }
             })

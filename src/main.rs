@@ -36,20 +36,22 @@ impl ParsedArgs {
 
         for path in self.target_folders.clone() {
             if !fs::metadata(&path).is_ok() {
-                panic!("Directory {} does not exist", path);
+                eprintln!("Directory {} does not exist", path);
+                std::process::exit(1);
             }
         }
     }
 
     pub fn validate_command(&self) {
         if self.command.len() == 0 {
-            panic!("Command must have at least one argument");
+            eprintln!("Command must have at least one argument");
+            std::process::exit(1);
         }
     }
 }
 
-static COMMA_SEPARATOR: &str = ",";
-static SPACE_SEPARATOR: &str = " ";
+const COMMA_SEPARATOR: &str = ",";
+const SPACE_SEPARATOR: &str = " ";
 
 fn main() {
     let args = Args::parse();
@@ -67,6 +69,7 @@ fn main() {
     // helpful console prints
     println!("Listen on folder(s): {:?}", parsed_args.target_folders);
     println!("Run '{:?}' command when file changes are detected", parsed_args.command);
+    println!("Press Ctrl+C to stop listening...\n"); // one extra new line for visual separation
 
     // start the main loop
     looper::do_loop(parsed_args.target_folders, parsed_args.command);

@@ -8,7 +8,7 @@ use notify::{RecursiveMode, Watcher, EventKind, event, recommended_watcher};
 use crate::command::run_command;
 use crate::counter;
 
-static WAIT_TIME_MILLIS: u64 = 200;
+const WAIT_TIME_MILLIS: u64 = 200;
 
 // store the main logic of the program
 pub fn do_loop(target_folders: Vec<String>, cmd_with_args: Vec<String>) {

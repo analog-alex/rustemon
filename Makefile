@@ -26,6 +26,10 @@ check_path:
 	@echo "Checking if /usr/local/bin is in the PATH..."
 	@echo $$PATH | grep -q "/usr/local/bin" || (echo "/usr/local/bin not found in PATH. Please add it." && false)
 
-# Install the release binary to the specified path
+# Install the release binary to the specified path (very UNIX-y use on linux or macOS only -- and even then...)
 install_to_path: check_path build
 	sudo cp target/release/$(BIN_NAME) /usr/local/bin/$(BIN_NAME)
+
+clear_local_runs:
+	@echo "Clearing $(BIN_NAME) processes..."
+	kill -9 $(pgrep rustemon) || true
